@@ -2,14 +2,132 @@
 // 0 ---> 3 live neighbours ===1
 // 1 ---> < 2 live neighbours || > 3 live neighbours === 0
 
-import {useRef} from 'react';
+// TODO: WIDTH, HEIGHT, RESOLUTION, SPEED as input
+// TODO: Clear canvas button
+// TODO: Dropdown to choose random and drawing
+// TODO: Draw on canvas
+// TODO: Some styles
+// TODO: Write tests
+
+import {useEffect, useRef, useState} from 'react';
+
+const buildGrid = (cols: number, rows: number): number[][] => {
+  return new Array(cols)
+    .fill(null)
+    .map(() =>
+      new Array(rows).fill(null).map(() => Math.floor(Math.random() * 2))
+    );
+};
+
+const renderGrid = (
+  context: CanvasRenderingContext2D,
+  grid: number[][],
+  resolution: number
+) => {
+  for (let col = 0; col < grid.length; col++) {
+    for (let row = 0; row < grid[col].length; row++) {
+      const cell = grid[col][row];
+
+      context.beginPath();
+      context.rect(col * resolution, row * resolution, resolution, resolution);
+      context.fillStyle = cell ? '#00ff00' : 'black';
+      context.strokeStyle = '#003300';
+      context.fill();
+      context.stroke();
+    }
+  }
+};
+
+const nextGeneration = (grid: number[][], cols: number, rows: number) => {
+  // create exact copy of current grid
+  const nextGeneration = grid.map((arr) => [...arr]);
+
+  for (let col = 0; col < grid.length; col++) {
+    for (let row = 0; row < grid[col].length; row++) {
+      const cell = grid[col][row];
+
+      let sumNeighbours = 0;
+
+      //looping through all neighbours
+      for (let i = -1; i < 2; i++) {
+        for (let j = -1; j < 2; j++) {
+          //do not loop over current cell
+          if (i === 0 && j === 0) {
+            continue;
+          }
+
+          const x_cell = col + i;
+          const y_cell = row + j;
+
+          if (x_cell >= 0 && y_cell >= 0 && x_cell < cols && y_cell < rows) {
+            const currentNeighbour = grid[col + i][row + j];
+            sumNeighbours += currentNeighbour;
+          }
+        }
+      }
+
+      // rules
+      if (cell === 1 && sumNeighbours < 2) {
+        nextGeneration[col][row] = 0;
+      } else if (cell === 1 && sumNeighbours > 3) {
+        nextGeneration[col][row] = 0;
+      } else if (cell === 0 && sumNeighbours === 3) {
+        nextGeneration[col][row] = 1;
+      }
+    }
+  }
+
+  return nextGeneration;
+};
+
+const resolution = 10;
+const CANVAS_WIDTH = 1000;
+const CANVAS_HEIGHT = 1000;
+const SPEED = 100;
 
 function App() {
+  const COLS = CANVAS_WIDTH / resolution;
+  const ROWS = CANVAS_HEIGHT / resolution;
+
+  const [grid, setGrid] = useState<number[][]>(buildGrid(COLS, ROWS));
+  const [start, setStart] = useState(false);
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    canvas.width = CANVAS_WIDTH;
+    canvas.height = CANVAS_HEIGHT;
+
+    renderGrid(context, grid, resolution);
+  }, [grid, start]);
+
+  useEffect(() => {
+    if (start) {
+      const interval = setInterval(() => {
+        setGrid(nextGeneration(grid, COLS, ROWS));
+      }, SPEED);
+      return () => clearInterval(interval);
+    }
+  }, [COLS, ROWS, grid, start]);
 
   return (
     <>
       <h1 className={'bg-amber-300'}>Conway’s Game of Life</h1>
+      <button
+        className={
+          'm-4 py-2 px-4 rounded-full border-0 bg-violet-50 text-violet-700 hover:bg-violet-100'
+        }
+        onClick={() => {
+          setStart(!start);
+        }}
+      >
+        {start ? 'Stop' : 'Start'}
+      </button>
       <canvas ref={canvasRef} />
     </>
   );
