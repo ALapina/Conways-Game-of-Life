@@ -4,19 +4,29 @@
 
 // TODO: WIDTH, HEIGHT, RESOLUTION, SPEED as input
 // TODO: Clear canvas button
-// TODO: Dropdown to choose random and drawing
+// DONE: Dropdown to choose random and drawing
+// TODO: IF RANDOM then REGENERATE button. If Drawing then Clear button.
 // TODO: Draw on canvas
 // TODO: Some styles
 // TODO: Write tests
 
-import {useEffect, useRef, useState} from 'react';
+//TODO:Minor: When we switch between modes preserve grid changes. DO not regenerate Grid
 
-const buildGrid = (cols: number, rows: number): number[][] => {
+import {useEffect, useRef, useState} from 'react';
+import {Switch} from './components/switch.tsx';
+
+const buildRandomGrid = (cols: number, rows: number): number[][] => {
+  const grid = [];
+  for (let i = 0; i < rows; i++) {
+    grid.push(Array.from(Array(cols), () => Math.floor(Math.random() * 2)));
+  }
+  return grid;
+};
+
+const buildEmptyGrid = (cols: number, rows: number): number[][] => {
   return new Array(cols)
     .fill(null)
-    .map(() =>
-      new Array(rows).fill(null).map(() => Math.floor(Math.random() * 2))
-    );
+    .map(() => new Array(rows).fill(null).map(() => 0));
 };
 
 const renderGrid = (
@@ -84,12 +94,12 @@ const resolution = 10;
 const CANVAS_WIDTH = 1000;
 const CANVAS_HEIGHT = 1000;
 const SPEED = 100;
+const COLS = CANVAS_WIDTH / resolution;
+const ROWS = CANVAS_HEIGHT / resolution;
 
 function App() {
-  const COLS = CANVAS_WIDTH / resolution;
-  const ROWS = CANVAS_HEIGHT / resolution;
-
-  const [grid, setGrid] = useState<number[][]>(buildGrid(COLS, ROWS));
+  const [drawingMode, setDrawingMode] = useState(false);
+  const [grid, setGrid] = useState<number[][]>(buildRandomGrid(COLS, ROWS));
   const [start, setStart] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -104,7 +114,7 @@ function App() {
     canvas.height = CANVAS_HEIGHT;
 
     renderGrid(context, grid, resolution);
-  }, [grid, start]);
+  }, [grid, start, drawingMode]);
 
   useEffect(() => {
     if (start) {
@@ -114,6 +124,12 @@ function App() {
       return () => clearInterval(interval);
     }
   }, [COLS, ROWS, grid, start]);
+
+  useEffect(() => {
+    if (drawingMode) {
+      setGrid(buildEmptyGrid(COLS, ROWS));
+    } else setGrid(buildRandomGrid(COLS, ROWS));
+  }, [drawingMode]);
 
   return (
     <>
@@ -128,6 +144,11 @@ function App() {
       >
         {start ? 'Stop' : 'Start'}
       </button>
+      <Switch
+        onChange={() => {
+          setDrawingMode(!drawingMode);
+        }}
+      />
       <canvas ref={canvasRef} />
     </>
   );
