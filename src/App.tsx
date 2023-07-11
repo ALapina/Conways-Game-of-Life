@@ -48,6 +48,36 @@ const renderGrid = (
   }
 };
 
+const countNeighbors = (
+  grid: number[][],
+  col: number,
+  row: number,
+  cols: number,
+  rows: number
+) => {
+  let sumNeighbours = 0;
+
+  //looping through all neighbours
+  for (let i = -1; i < 2; i++) {
+    for (let j = -1; j < 2; j++) {
+      //do not loop over current cell
+      if (i === 0 && j === 0) {
+        continue;
+      }
+
+      const x_cell = col + i;
+      const y_cell = row + j;
+
+      if (x_cell >= 0 && y_cell >= 0 && x_cell < cols && y_cell < rows) {
+        const currentNeighbour = grid[col + i][row + j];
+        sumNeighbours += currentNeighbour;
+      }
+    }
+  }
+
+  return sumNeighbours;
+};
+
 const nextGeneration = (grid: number[][], cols: number, rows: number) => {
   // create exact copy of current grid
   const nextGeneration = grid.map((arr) => [...arr]);
@@ -56,33 +86,13 @@ const nextGeneration = (grid: number[][], cols: number, rows: number) => {
     for (let row = 0; row < grid[col].length; row++) {
       const cell = grid[col][row];
 
-      let sumNeighbours = 0;
-
-      //looping through all neighbours
-      for (let i = -1; i < 2; i++) {
-        for (let j = -1; j < 2; j++) {
-          //do not loop over current cell
-          if (i === 0 && j === 0) {
-            continue;
-          }
-
-          const x_cell = col + i;
-          const y_cell = row + j;
-
-          if (x_cell >= 0 && y_cell >= 0 && x_cell < cols && y_cell < rows) {
-            const currentNeighbour = grid[col + i][row + j];
-            sumNeighbours += currentNeighbour;
-          }
-        }
-      }
+      const neighbors = countNeighbors(grid, col, row, cols, rows);
 
       // rules
-      if (cell === 1 && sumNeighbours < 2) {
-        nextGeneration[col][row] = 0;
-      } else if (cell === 1 && sumNeighbours > 3) {
-        nextGeneration[col][row] = 0;
-      } else if (cell === 0 && sumNeighbours === 3) {
+      if (cell == 0 && neighbors == 3) {
         nextGeneration[col][row] = 1;
+      } else if (cell == 1 && (neighbors < 2 || neighbors > 3)) {
+        nextGeneration[col][row] = 0;
       }
     }
   }
