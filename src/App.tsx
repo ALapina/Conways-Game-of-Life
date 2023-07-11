@@ -155,6 +155,7 @@ function App() {
         {start ? 'Stop' : 'Start'}
       </button>
       <Switch
+        gameRunning={start}
         onChange={() => {
           setDrawingMode(!drawingMode);
         }}
