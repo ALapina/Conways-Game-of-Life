@@ -2,12 +2,15 @@
 // 0 ---> 3 live neighbours ===1
 // 1 ---> < 2 live neighbours || > 3 live neighbours === 0
 
-// TODO: WIDTH, HEIGHT, RESOLUTION, SPEED as input
 // DONE: Dropdown to choose random and drawing
 // DONE: IF RANDOM then REGENERATE button. If Drawing then Clear button.
+// DONE: SPEED as input
 // TODO: Draw on canvas
 // TODO: Some styles
 // TODO: Write tests
+// TODO: Maybe WIDTH, HEIGHT, RESOLUTION as inputs (probably no)
+// TODO: Readme
+// TODO: Host on github pages
 
 //TODO:Minor: When we switch between modes preserve grid changes. DO not regenerate Grid
 
@@ -102,7 +105,7 @@ const nextGeneration = (grid: number[][], cols: number, rows: number) => {
 const resolution = 10;
 const CANVAS_WIDTH = 1000;
 const CANVAS_HEIGHT = 1000;
-const SPEED = 100;
+const DEFAULT_SPEED = 100;
 const COLS = CANVAS_WIDTH / resolution;
 const ROWS = CANVAS_HEIGHT / resolution;
 
@@ -111,6 +114,7 @@ function App() {
   const [grid, setGrid] = useState<number[][]>(buildRandomGrid(COLS, ROWS));
   const [start, setStart] = useState(false);
   const [resetGrid, setResetGrid] = useState(false);
+  const [speed, setSpeed] = useState(DEFAULT_SPEED);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -130,7 +134,7 @@ function App() {
     if (start) {
       const interval = setInterval(() => {
         setGrid(nextGeneration(grid, COLS, ROWS));
-      }, SPEED);
+      }, speed);
       return () => clearInterval(interval);
     }
   }, [COLS, ROWS, grid, start]);
@@ -155,8 +159,9 @@ function App() {
         {start ? 'Stop' : 'Start'}
       </button>
       <button
+        disabled={start}
         className={
-          'm-4 py-2 px-4 rounded-full border-0 bg-violet-50 text-violet-700 hover:bg-violet-100'
+          'disabled:opacity-50 m-4 py-2 px-4 rounded-full border-0 bg-violet-50 text-violet-700 hover:bg-violet-100'
         }
         onClick={() => {
           setResetGrid(!resetGrid);
@@ -164,6 +169,20 @@ function App() {
       >
         {drawingMode ? 'Clear Field' : 'Regenerate Random'}
       </button>
+      <div className={'p-4 border border-green-800'}>
+        <label htmlFor={'speed'} className={'pr-4'}>
+          Speed from 100 (faster) to 1000 (slower)
+        </label>
+        <input
+          onChange={(e) => setSpeed(parseInt(e.target.value))}
+          value={speed}
+          min={100}
+          step={100}
+          max={1000}
+          name={'speed'}
+          type={'range'}
+        />
+      </div>
       <Switch
         gameRunning={start}
         onChange={() => {
