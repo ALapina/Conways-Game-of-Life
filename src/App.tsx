@@ -16,32 +16,38 @@
 
 import {useEffect, useRef, useState} from 'react';
 import {Switch} from './components/switch.tsx';
+import {
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  DEFAULT_SPEED,
+  RESOLUTION,
+  COLS,
+  ROWS,
+} from './constants.ts';
 
-const buildRandomGrid = (cols: number, rows: number): number[][] => {
+const buildRandomGrid = (): number[][] => {
   const grid = [];
-  for (let i = 0; i < rows; i++) {
-    grid.push(Array.from(Array(cols), () => Math.floor(Math.random() * 2)));
+  for (let i = 0; i < ROWS; i++) {
+    grid.push(Array.from(Array(COLS), () => Math.floor(Math.random() * 2)));
   }
   return grid;
 };
 
-const buildEmptyGrid = (cols: number, rows: number): number[][] => {
-  return new Array(cols)
+const buildEmptyGrid = (): number[][] => {
+  return new Array(COLS)
     .fill(null)
-    .map(() => new Array(rows).fill(null).map(() => 0));
+    .map(() => new Array(ROWS).fill(null).map(() => 0));
 };
 
-const renderGrid = (
-  context: CanvasRenderingContext2D,
-  grid: number[][],
-  resolution: number
-) => {
+const renderGrid = (context: CanvasRenderingContext2D, grid: number[][]) => {
   for (let col = 0; col < grid.length; col++) {
     for (let row = 0; row < grid[col].length; row++) {
       const cell = grid[col][row];
+      const x = col * RESOLUTION;
+      const y = row * RESOLUTION;
 
       context.beginPath();
-      context.rect(col * resolution, row * resolution, resolution, resolution);
+      context.rect(x, y, RESOLUTION, RESOLUTION);
       context.fillStyle = cell ? '#00ff00' : 'black';
       context.strokeStyle = '#003300';
       context.fill();
@@ -50,13 +56,7 @@ const renderGrid = (
   }
 };
 
-const countNeighbors = (
-  grid: number[][],
-  col: number,
-  row: number,
-  cols: number,
-  rows: number
-) => {
+const countNeighbors = (grid: number[][], col: number, row: number) => {
   let sumNeighbours = 0;
 
   //looping through all neighbours
@@ -70,7 +70,7 @@ const countNeighbors = (
       const x_cell = col + i;
       const y_cell = row + j;
 
-      if (x_cell >= 0 && y_cell >= 0 && x_cell < cols && y_cell < rows) {
+      if (x_cell >= 0 && y_cell >= 0 && x_cell < COLS && y_cell < ROWS) {
         const currentNeighbour = grid[col + i][row + j];
         sumNeighbours += currentNeighbour;
       }
@@ -80,7 +80,7 @@ const countNeighbors = (
   return sumNeighbours;
 };
 
-const nextGeneration = (grid: number[][], cols: number, rows: number) => {
+const nextGeneration = (grid: number[][]) => {
   // create exact copy of current grid
   const nextGeneration = grid.map((arr) => [...arr]);
 
@@ -88,7 +88,7 @@ const nextGeneration = (grid: number[][], cols: number, rows: number) => {
     for (let row = 0; row < grid[col].length; row++) {
       const cell = grid[col][row];
 
-      const neighbors = countNeighbors(grid, col, row, cols, rows);
+      const neighbors = countNeighbors(grid, col, row);
 
       // rules
       if (cell == 0 && neighbors == 3) {
@@ -102,16 +102,9 @@ const nextGeneration = (grid: number[][], cols: number, rows: number) => {
   return nextGeneration;
 };
 
-const resolution = 10;
-const CANVAS_WIDTH = 1000;
-const CANVAS_HEIGHT = 1000;
-const DEFAULT_SPEED = 100;
-const COLS = CANVAS_WIDTH / resolution;
-const ROWS = CANVAS_HEIGHT / resolution;
-
 function App() {
   const [drawingMode, setDrawingMode] = useState(false);
-  const [grid, setGrid] = useState<number[][]>(buildRandomGrid(COLS, ROWS));
+  const [grid, setGrid] = useState<number[][]>(buildRandomGrid());
   const [start, setStart] = useState(false);
   const [resetGrid, setResetGrid] = useState(false);
   const [speed, setSpeed] = useState(DEFAULT_SPEED);
@@ -127,13 +120,13 @@ function App() {
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
-    renderGrid(context, grid, resolution);
+    renderGrid(context, grid);
   }, [grid, start, drawingMode]);
 
   useEffect(() => {
     if (start) {
       const interval = setInterval(() => {
-        setGrid(nextGeneration(grid, COLS, ROWS));
+        setGrid(nextGeneration(grid));
       }, speed);
       return () => clearInterval(interval);
     }
@@ -141,8 +134,8 @@ function App() {
 
   useEffect(() => {
     if (drawingMode || (drawingMode && resetGrid)) {
-      setGrid(buildEmptyGrid(COLS, ROWS));
-    } else setGrid(buildRandomGrid(COLS, ROWS));
+      setGrid(buildEmptyGrid());
+    } else setGrid(buildRandomGrid());
   }, [drawingMode, resetGrid]);
 
   return (
