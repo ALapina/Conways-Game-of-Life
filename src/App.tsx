@@ -12,7 +12,7 @@
 // TODO: Readme
 // TODO: Host on github pages
 
-//TODO:Minor: When we switch between modes preserve grid changes. DO not regenerate Grid
+//DONE: When we switch between modes preserve grid changes. DO not regenerate Grid
 
 import {useEffect, useRef, useState} from 'react';
 import {Switch} from './components/switch.tsx';
@@ -104,9 +104,9 @@ const nextGeneration = (grid: number[][]) => {
 
 function App() {
   const [drawingMode, setDrawingMode] = useState(false);
-  const [grid, setGrid] = useState<number[][]>(buildRandomGrid());
+  const [drawingGrid, setDrawingGrid] = useState(buildEmptyGrid());
+  const [randomGrid, setRandomGrid] = useState(buildRandomGrid());
   const [start, setStart] = useState(false);
-  const [resetGrid, setResetGrid] = useState(false);
   const [speed, setSpeed] = useState(DEFAULT_SPEED);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -120,23 +120,25 @@ function App() {
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
-    renderGrid(context, grid);
-  }, [grid, start, drawingMode]);
+    if (drawingMode) {
+      renderGrid(context, drawingGrid);
+    } else renderGrid(context, randomGrid);
+  }, [drawingGrid, randomGrid, start, drawingMode]);
 
   useEffect(() => {
-    if (start) {
+    if (start && drawingMode) {
       const interval = setInterval(() => {
-        setGrid(nextGeneration(grid));
+        setDrawingGrid(nextGeneration(drawingGrid));
       }, speed);
       return () => clearInterval(interval);
     }
-  }, [COLS, ROWS, grid, start]);
-
-  useEffect(() => {
-    if (drawingMode || (drawingMode && resetGrid)) {
-      setGrid(buildEmptyGrid());
-    } else setGrid(buildRandomGrid());
-  }, [drawingMode, resetGrid]);
+    if (start && !drawingMode) {
+      const interval = setInterval(() => {
+        setRandomGrid(nextGeneration(randomGrid));
+      }, speed);
+      return () => clearInterval(interval);
+    }
+  }, [drawingGrid, randomGrid, start, drawingMode, speed]);
 
   return (
     <>
@@ -157,7 +159,9 @@ function App() {
           'disabled:opacity-50 m-4 py-2 px-4 rounded-full border-0 bg-violet-50 text-violet-700 hover:bg-violet-100'
         }
         onClick={() => {
-          setResetGrid(!resetGrid);
+          if (drawingMode) {
+            setDrawingGrid(buildEmptyGrid());
+          } else setRandomGrid(buildRandomGrid());
         }}
       >
         {drawingMode ? 'Clear Field' : 'Regenerate Random'}
