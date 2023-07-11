@@ -3,9 +3,8 @@
 // 1 ---> < 2 live neighbours || > 3 live neighbours === 0
 
 // TODO: WIDTH, HEIGHT, RESOLUTION, SPEED as input
-// TODO: Clear canvas button
 // DONE: Dropdown to choose random and drawing
-// TODO: IF RANDOM then REGENERATE button. If Drawing then Clear button.
+// DONE: IF RANDOM then REGENERATE button. If Drawing then Clear button.
 // TODO: Draw on canvas
 // TODO: Some styles
 // TODO: Write tests
@@ -111,6 +110,7 @@ function App() {
   const [drawingMode, setDrawingMode] = useState(false);
   const [grid, setGrid] = useState<number[][]>(buildRandomGrid(COLS, ROWS));
   const [start, setStart] = useState(false);
+  const [resetGrid, setResetGrid] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -136,10 +136,10 @@ function App() {
   }, [COLS, ROWS, grid, start]);
 
   useEffect(() => {
-    if (drawingMode) {
+    if (drawingMode || (drawingMode && resetGrid)) {
       setGrid(buildEmptyGrid(COLS, ROWS));
     } else setGrid(buildRandomGrid(COLS, ROWS));
-  }, [drawingMode]);
+  }, [drawingMode, resetGrid]);
 
   return (
     <>
@@ -153,6 +153,16 @@ function App() {
         }}
       >
         {start ? 'Stop' : 'Start'}
+      </button>
+      <button
+        className={
+          'm-4 py-2 px-4 rounded-full border-0 bg-violet-50 text-violet-700 hover:bg-violet-100'
+        }
+        onClick={() => {
+          setResetGrid(!resetGrid);
+        }}
+      >
+        {drawingMode ? 'Clear Field' : 'Regenerate Random'}
       </button>
       <Switch
         gameRunning={start}
