@@ -1,8 +1,9 @@
 {
-  "name": "cyber-test",
+  "name": "conways_game-of-life",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "/game-of-life",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
