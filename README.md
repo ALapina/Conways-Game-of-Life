@@ -5,8 +5,7 @@ The Game of Life, also known simply as Life, is a cellular automaton devised by 
 
 ## Demo
 
-Insert gif or link to demo
-
+https://alapina.github.io/Conways-Game-of-Life/
 
 ## Run Locally
 
