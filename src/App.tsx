@@ -127,7 +127,7 @@ function App() {
     }
   }, [drawingGrid, randomGrid, start, drawingMode, speed]);
 
-  const drawOnCanvas = (nativeEvent) => {
+  const drawOnCanvas = (nativeEvent: any) => {
     const {offsetX, offsetY} = nativeEvent;
     const x = Math.floor(offsetX / RESOLUTION)
     const y = Math.floor(offsetY / RESOLUTION)
@@ -139,7 +139,7 @@ function App() {
     }
   }
 
-  const startDrawing = ({nativeEvent}) => {
+  const startDrawing = ({nativeEvent}:any) => {
     drawOnCanvas(nativeEvent);
     setIsDrawing(true);
   }
@@ -148,7 +148,7 @@ function App() {
     setIsDrawing(false);
   };
 
-  const draw = ({nativeEvent}) => {
+  const draw = ({nativeEvent}:any) => {
     if (!isDrawing) {
       return;
     }
