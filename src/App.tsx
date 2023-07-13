@@ -24,6 +24,7 @@ import {
   COLS,
   ROWS,
 } from './constants.ts';
+import {renderGrid} from "./utils/render-grid.ts";
 
 const buildRandomGrid = (): number[][] => {
   const grid = [];
@@ -37,23 +38,6 @@ const buildEmptyGrid = (): number[][] => {
   return new Array(COLS)
     .fill(null)
     .map(() => new Array(ROWS).fill(null).map(() => 0));
-};
-
-const renderGrid = (context: CanvasRenderingContext2D, grid: number[][]) => {
-  for (let col = 0; col < grid.length; col++) {
-    for (let row = 0; row < grid[col].length; row++) {
-      const cell = grid[col][row];
-      const x = col * RESOLUTION;
-      const y = row * RESOLUTION;
-
-      context.beginPath();
-      context.rect(x, y, RESOLUTION, RESOLUTION);
-      context.fillStyle = cell ? '#00ff00' : 'black';
-      context.strokeStyle = '#003300';
-      context.fill();
-      context.stroke();
-    }
-  }
 };
 
 const countNeighbors = (grid: number[][], col: number, row: number) => {
@@ -140,6 +124,18 @@ function App() {
     }
   }, [drawingGrid, randomGrid, start, drawingMode, speed]);
 
+  const startDrawing = ({nativeEvent}) => {
+    const {offsetX, offsetY} = nativeEvent;
+    const x = Math.floor(offsetX / RESOLUTION)
+    const y = Math.floor(offsetY / RESOLUTION)
+
+    if (!drawingGrid[x][y]) {
+      const copyOfGrid = [...drawingGrid];
+      copyOfGrid[x][y] = copyOfGrid[x][y] ? 0 : 1;
+      setDrawingGrid(copyOfGrid);
+    }
+  }
+
   return (
     <>
       <h1 className={'bg-amber-300'}>Conway’s Game of Life</h1>
@@ -186,7 +182,7 @@ function App() {
           setDrawingMode(!drawingMode);
         }}
       />
-      <canvas ref={canvasRef} />
+      <canvas onMouseDown={startDrawing} ref={canvasRef} />
     </>
   );
 }
