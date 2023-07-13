@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "/game-of-life",
+  "homepage": "/Conways-Game-of-Life",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
