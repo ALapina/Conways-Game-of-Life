@@ -5,7 +5,7 @@
 // DONE: Dropdown to choose random and drawing
 // DONE: IF RANDOM then REGENERATE button. If Drawing then Clear button.
 // DONE: SPEED as input
-// TODO: Draw on canvas
+// DONE: Draw on canvas
 // TODO: Some styles
 // TODO: Write tests
 // TODO: Maybe WIDTH, HEIGHT, RESOLUTION as inputs (probably no)
@@ -92,14 +92,17 @@ function App() {
   const [randomGrid, setRandomGrid] = useState(buildRandomGrid());
   const [start, setStart] = useState(false);
   const [speed, setSpeed] = useState(DEFAULT_SPEED);
+  const [isDrawing, setIsDrawing] = useState(false)
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const contextRef = useRef<CanvasRenderingContext2D | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const context = canvas.getContext('2d');
     if (!context) return;
+    contextRef.current = context;
 
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
@@ -124,7 +127,7 @@ function App() {
     }
   }, [drawingGrid, randomGrid, start, drawingMode, speed]);
 
-  const startDrawing = ({nativeEvent}) => {
+  const drawOnCanvas = (nativeEvent) => {
     const {offsetX, offsetY} = nativeEvent;
     const x = Math.floor(offsetX / RESOLUTION)
     const y = Math.floor(offsetY / RESOLUTION)
@@ -134,6 +137,22 @@ function App() {
       copyOfGrid[x][y] = copyOfGrid[x][y] ? 0 : 1;
       setDrawingGrid(copyOfGrid);
     }
+  }
+
+  const startDrawing = ({nativeEvent}) => {
+    drawOnCanvas(nativeEvent);
+    setIsDrawing(true);
+  }
+
+  const finishDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const draw = ({nativeEvent}) => {
+    if (!isDrawing) {
+      return;
+    }
+    drawOnCanvas(nativeEvent);
   }
 
   return (
@@ -182,7 +201,7 @@ function App() {
           setDrawingMode(!drawingMode);
         }}
       />
-      <canvas onMouseDown={startDrawing} ref={canvasRef} />
+      <canvas onMouseDown={startDrawing} onMouseUp={finishDrawing} onMouseMove={draw} ref={canvasRef} />
     </>
   );
 }
