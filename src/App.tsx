@@ -36,10 +36,10 @@ function App() {
   return (
     <div
       className={
-        'w-full text-xl font-bruno-ace bg-black text-primaryGreen mx-auto max-w-7xl border-green-800 border py-24 px-24'
+        'w-full text-xl font-bruno-ace bg-black text-primaryGreen mx-auto max-w-7xl pt-20 px-24 tall:pt-0 tall:grid h-screen tall:content-center'
       }
     >
-      <div className={'flex justify-between'}>
+      <div className={'flex flex-col lg:flex-row lg:justify-between'}>
         <div className={'flex items-center flex-col'}>
           <h1 className={'text-center pb-16'}>
             <span className={'font-pacifico block text-3xl pb-3'}>

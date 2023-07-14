@@ -14,6 +14,9 @@ export default {
       backgroundImage: {
         'screen-texture': "url('./assets/texture.jpg')",
       },
+      screens: {
+        tall: {raw: '(min-height: 900px)'},
+      },
     },
   },
   plugins: [],

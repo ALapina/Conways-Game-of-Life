@@ -37,5 +37,6 @@ Start the game
 - React
 - TypeScript
 - Tailwind CSS
+- [Radix-UI toggle-group component](https://www.radix-ui.com/docs/primitives/components/toggle-group)
 - canvas
 - [GitHub action](https://github.com/JamesIves/github-pages-deploy-action) for automatically build, test and deploy project to GitHub pages.
