@@ -17,8 +17,6 @@ export const Canvas = ({grid, setGrid, start}: Props) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     contextRef.current = canvas.getContext('2d');
-    canvas.width = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
   }, []);
 
   useEffect(() => {
@@ -28,6 +26,7 @@ export const Canvas = ({grid, setGrid, start}: Props) => {
   }, [grid, start]);
 
   const drawOnCanvas = (nativeEvent: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const {offsetX, offsetY} = nativeEvent;
     const x = Math.floor(offsetX / RESOLUTION);
     const y = Math.floor(offsetY / RESOLUTION);
@@ -44,10 +43,6 @@ export const Canvas = ({grid, setGrid, start}: Props) => {
     drawOnCanvas(nativeEvent);
   };
 
-  const finishDrawing = () => {
-    setIsDrawing(false);
-  };
-
   const draw = ({nativeEvent}: any) => {
     if (!isDrawing) return;
     drawOnCanvas(nativeEvent);
@@ -55,8 +50,11 @@ export const Canvas = ({grid, setGrid, start}: Props) => {
 
   return (
     <canvas
+      className={'pointer-events-auto'}
+      width={CANVAS_WIDTH}
+      height={CANVAS_HEIGHT}
       onMouseDown={startDrawing}
-      onMouseUp={finishDrawing}
+      onMouseUp={() => setIsDrawing(false)}
       onMouseMove={draw}
       ref={canvasRef}
     />

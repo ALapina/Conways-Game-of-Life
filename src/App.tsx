@@ -6,31 +6,21 @@
 // DONE: IF RANDOM then REGENERATE button. If Drawing then Clear button.
 // DONE: SPEED as input
 // DONE: Draw on canvas
-// TODO: Some styles
+// DONE: Some styles
 // TODO: Write tests
-// TODO: Maybe WIDTH, HEIGHT, RESOLUTION as inputs (probably no)
 // DONE: Readme
 // DONE: Host on github pages
 
 import {useEffect, useState} from 'react';
-import {DEFAULT_SPEED, COLS, ROWS} from './constants.ts';
+import {DEFAULT_SPEED} from './constants.ts';
 import {buildNextGenerationGrid} from './utils/build-next-generation-grid.tsx';
 import {Canvas} from './components/canvas.tsx';
-
-const buildRandomGrid = (): number[][] => {
-  const grid = [];
-  for (let i = 0; i < ROWS; i++) {
-    grid.push(Array.from(Array(COLS), () => Math.floor(Math.random() * 2)));
-  }
-  return grid;
-};
-
-const buildEmptyGrid = (): number[][] => {
-  return new Array(COLS).fill(null).map(() => new Array(ROWS).fill(0));
-};
+import {ToggleGroup} from './components/toggle-group.tsx';
+import {Button} from './components/button.tsx';
+import {buildGrid} from './utils/build-grid.ts';
 
 function App() {
-  const [grid, setGrid] = useState(buildEmptyGrid());
+  const [grid, setGrid] = useState(buildGrid());
   const [start, setStart] = useState(false);
   const [speed, setSpeed] = useState(DEFAULT_SPEED);
 
@@ -44,52 +34,54 @@ function App() {
   }, [grid, start, speed]);
 
   return (
-    <>
-      <h1 className={'bg-amber-300'}>Conway’s Game of Life</h1>
-      <button
-        className={
-          'm-4 py-2 px-4 rounded-full border-0 bg-violet-50 text-violet-700 hover:bg-violet-100'
-        }
-        onClick={() => {
-          setStart(!start);
-        }}
-      >
-        {start ? 'Stop' : 'Start'}
-      </button>
-      <button
-        disabled={start}
-        className={
-          'disabled:opacity-50 m-4 py-2 px-4 rounded-full border-0 bg-violet-50 text-violet-700 hover:bg-violet-100'
-        }
-        onClick={() => setGrid(buildEmptyGrid())}
-      >
-        {'Clear Field'}
-      </button>
-      <button
-        disabled={start}
-        className={
-          'disabled:opacity-50 m-4 py-2 px-4 rounded-full border-0 bg-violet-50 text-violet-700 hover:bg-violet-100'
-        }
-        onClick={() => setGrid(buildRandomGrid())}
-      >
-        {'Generate Random'}
-      </button>
-      <div className={'p-4 border border-green-800'}>
-        <label htmlFor={'speed'} className={'pr-4'}>
-          Speed from 100 (faster) to 1000 (slower)
-        </label>
-        <input
-          onChange={(e) => setSpeed(parseInt(e.target.value))}
-          value={speed}
-          min={100}
-          step={100}
-          max={1000}
-          name={'speed'}
-          type={'range'}
-        />
+    <div
+      className={
+        'w-full text-xl font-bruno-ace bg-black text-primaryGreen mx-auto max-w-7xl border-green-800 border py-24 px-24'
+      }
+    >
+      <div className={'flex justify-between'}>
+        <div className={'flex items-center flex-col'}>
+          <h1 className={'text-center pb-16'}>
+            <span className={'font-pacifico block text-3xl pb-3'}>
+              Conway’s{' '}
+            </span>
+            <span className={'font-monoton text-4xl'}>Game of Life</span>
+          </h1>
+          <Button
+            size={'lg'}
+            icon={start ? '2' : '1'}
+            name={start ? 'Stop' : 'Start'}
+            onClick={() => setStart(!start)}
+          />
+          <div className={'w-full h-px bg-primaryGreen my-24'} />
+
+          <div className={'flex items-center'}>
+            <span className={'pr-6'}>SPEED </span>
+            <ToggleGroup onValueChange={setSpeed} />
+          </div>
+
+          <div className={'flex pt-8 gap-x-5'}>
+            <Button
+              disabled={start}
+              icon={'X'}
+              name={'Clear'}
+              onClick={() => setGrid(buildGrid())}
+            />
+            <Button
+              disabled={start}
+              icon={'0'}
+              name={'Random'}
+              onClick={() => setGrid(buildGrid(true))}
+            />
+          </div>
+        </div>
+
+        <div className='relative mask pointer-events-none'>
+          <div className='absolute pointer-events-none overflow-hidden top-0 left-0 w-full h-full opacity-40 bg-screen-texture' />
+          <Canvas grid={grid} setGrid={setGrid} start={start} />
+        </div>
       </div>
-      <Canvas grid={grid} setGrid={setGrid} start={start} />
-    </>
+    </div>
   );
 }
 
