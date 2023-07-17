@@ -2,15 +2,6 @@
 // 0 ---> 3 live neighbours ===1
 // 1 ---> < 2 live neighbours || > 3 live neighbours === 0
 
-// DONE: Dropdown to choose random and drawing
-// DONE: IF RANDOM then REGENERATE button. If Drawing then Clear button.
-// DONE: SPEED as input
-// DONE: Draw on canvas
-// DONE: Some styles
-// TODO: Write tests
-// DONE: Readme
-// DONE: Host on github pages
-
 import {useEffect, useState} from 'react';
 import {DEFAULT_SPEED} from './constants.ts';
 import {buildNextGenerationGrid} from './utils/build-next-generation-grid.tsx';
