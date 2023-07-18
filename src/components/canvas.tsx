@@ -25,27 +25,16 @@ export const Canvas = ({grid, setGrid, start}: Props) => {
     renderGrid(ctx, grid);
   }, [grid, start]);
 
-  const drawOnCanvas = (nativeEvent: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const drawOnCanvas = (nativeEvent: MouseEvent, isOnMouseMove?: boolean) => {
     const {offsetX, offsetY} = nativeEvent;
     const x = Math.floor(offsetX / RESOLUTION);
     const y = Math.floor(offsetY / RESOLUTION);
+    const copyOfGrid = [...grid];
 
-    if (!grid[x][y]) {
-      const copyOfGrid = [...grid];
-      copyOfGrid[x][y] = copyOfGrid[x][y] ? 0 : 1;
-      setGrid(copyOfGrid);
-    }
-  };
-
-  const startDrawing = ({nativeEvent}: any) => {
-    setIsDrawing(true);
-    drawOnCanvas(nativeEvent);
-  };
-
-  const draw = ({nativeEvent}: any) => {
-    if (!isDrawing) return;
-    drawOnCanvas(nativeEvent);
+    if (isOnMouseMove) {
+      copyOfGrid[x][y] = 1;
+    } else copyOfGrid[x][y] = copyOfGrid[x][y] ? 0 : 1;
+    setGrid(copyOfGrid);
   };
 
   return (
@@ -53,9 +42,15 @@ export const Canvas = ({grid, setGrid, start}: Props) => {
       className={'pointer-events-auto'}
       width={CANVAS_WIDTH}
       height={CANVAS_HEIGHT}
-      onMouseDown={startDrawing}
+      onMouseDown={({nativeEvent}) => {
+        setIsDrawing(true);
+        drawOnCanvas(nativeEvent);
+      }}
       onMouseUp={() => setIsDrawing(false)}
-      onMouseMove={draw}
+      onMouseMove={({nativeEvent}) => {
+        if (!isDrawing) return;
+        drawOnCanvas(nativeEvent, true);
+      }}
       ref={canvasRef}
     />
   );

@@ -27,13 +27,13 @@ function App() {
   return (
     <div
       className={
-        'w-full text-xl font-bruno-ace bg-black text-primaryGreen mx-auto max-w-7xl pt-20 px-24 tall:pt-0 tall:grid h-screen tall:content-center'
+        'mx-auto h-screen w-full max-w-7xl bg-black pt-10 font-bruno-ace text-xl text-primaryGreen lg:px-10 lg:pt-20 xl:px-24 tall:grid tall:content-center tall:pt-0'
       }
     >
-      <div className={'flex flex-col lg:flex-row lg:justify-between'}>
-        <div className={'flex items-center flex-col'}>
-          <h1 className={'text-center pb-16'}>
-            <span className={'font-pacifico block text-3xl pb-3'}>
+      <div className={'flex flex-col-reverse lg:flex-row lg:justify-between'}>
+        <div className={'flex flex-col items-center'}>
+          <h1 className={'pb-8 pt-8 text-center lg:pb-16 lg:pt-0'}>
+            <span className={'block pb-3 font-pacifico text-3xl'}>
               Conway’s{' '}
             </span>
             <span className={'font-monoton text-4xl'}>Game of Life</span>
@@ -44,14 +44,14 @@ function App() {
             name={start ? 'Stop' : 'Start'}
             onClick={() => setStart(!start)}
           />
-          <div className={'w-full h-px bg-primaryGreen my-24'} />
+          <div className={'my-12 h-px w-full bg-primaryGreen lg:my-24'} />
 
           <div className={'flex items-center'}>
             <span className={'pr-6'}>SPEED </span>
             <ToggleGroup onValueChange={setSpeed} />
           </div>
 
-          <div className={'flex pt-8 gap-x-5'}>
+          <div className={'flex gap-x-5 py-8'}>
             <Button
               disabled={start}
               icon={'X'}
@@ -67,8 +67,8 @@ function App() {
           </div>
         </div>
 
-        <div className='relative mask pointer-events-none'>
-          <div className='absolute pointer-events-none overflow-hidden top-0 left-0 w-full h-full opacity-40 bg-screen-texture' />
+        <div className='mask pointer-events-none relative self-center'>
+          <div className='pointer-events-none absolute left-0 top-0 h-full w-full overflow-hidden bg-screen-texture opacity-40' />
           <Canvas grid={grid} setGrid={setGrid} start={start} />
         </div>
       </div>
